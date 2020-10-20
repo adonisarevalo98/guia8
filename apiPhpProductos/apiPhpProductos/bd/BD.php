@@ -3,7 +3,7 @@ $pdo=null;
 $host="localhost";
 $user="root";
 $password="";
-$bd="escuela";
+$bd="productos";
 
 function conectar(){
     try{

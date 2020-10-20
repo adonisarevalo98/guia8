@@ -4,25 +4,24 @@ import {Modal, ModalBody, ModalFooter, ModalHeader} from 'reactstrap';
 import axios from 'axios';
 
 function App() {
-  const baseUrl="http://localhost/apiPhpEscuela/";
+  const baseUrl="http://localhost/apiPhpProductos/";
   const [data, setData]=useState([]);
   const [modalInsertar, setModalInsertar]= useState(false);
   const [modalEditar, setModalEditar]= useState(false);
   const [modalEliminar, setModalEliminar]= useState(false);
-  const [alumnoSeleccionado, setalumnoSeleccionado]=useState({
+  const [productoSeleccionado, setproductoSeleccionado]=useState({
     id: '',
     nombre: '',
-    apellido: '',
-    edad: ''
+    existencia: ''
   });
 
   const handleChange=e=>{
     const {name, value}=e.target;
-    setalumnoSeleccionado((prevState)=>({
+    setproductoSeleccionado((prevState)=>({
       ...prevState,
       [name]: value
     }))
-    console.log(alumnoSeleccionado);
+    console.log(productoSeleccionado);
   }
 
   const abrirCerrarModalInsertar=()=>{
@@ -48,9 +47,8 @@ function App() {
 
   const peticionPost=async()=>{
     var f = new FormData();
-    f.append("nombre", alumnoSeleccionado.nombre);
-    f.append("apellido", alumnoSeleccionado.apellido);
-    f.append("edad", alumnoSeleccionado.edad);
+    f.append("nombre", productoSeleccionado.nombre);
+    f.append("existencia", productoSeleccionado.existencia);
     f.append("METHOD", "POST");
     await axios.post(baseUrl, f)
     .then(response=>{
@@ -63,18 +61,16 @@ function App() {
 
   const peticionPut=async()=>{
     var f = new FormData();
-    f.append("nombre", alumnoSeleccionado.nombre);
-    f.append("apellido", alumnoSeleccionado.apellido);
-    f.append("edad", alumnoSeleccionado.edad);
+    f.append("nombre", productoSeleccionado.nombre);
+    f.append("existencia", productoSeleccionado.existencia);
     f.append("METHOD", "PUT");
-    await axios.post(baseUrl, f, {params: {id: alumnoSeleccionado.id}})
+    await axios.post(baseUrl, f, {params: {id: productoSeleccionado.id}})
     .then(response=>{
       var dataNueva= data;
-      dataNueva.map(alumno=>{
-        if(alumno.id===alumnoSeleccionado.id){
-          alumno.nombre=alumnoSeleccionado.nombre;
-          alumno.apellido=alumnoSeleccionado.apellido;
-          alumno.edad=alumnoSeleccionado.edad;
+      dataNueva.map(producto=>{
+        if(producto.id===productoSeleccionado.id){
+          producto.nombre=productoSeleccionado.nombre;
+          producto.existencia=productoSeleccionado.existencia;
         }
       });
       setData(dataNueva);
@@ -87,17 +83,17 @@ function App() {
   const peticionDelete=async()=>{
     var f = new FormData();
     f.append("METHOD", "DELETE");
-    await axios.post(baseUrl, f, {params: {id: alumnoSeleccionado.id}})
+    await axios.post(baseUrl, f, {params: {id: productoSeleccionado.id}})
     .then(response=>{
-      setData(data.filter(alumno=>alumno.id!==alumnoSeleccionado.id));
+      setData(data.filter(producto=>producto.id!==productoSeleccionado.id));
       abrirCerrarModalEliminar();
     }).catch(error=>{
       console.log(error);
     })
   }
 
-  const seleccionarAlumno=(alumno, caso)=>{
-    setalumnoSeleccionado(alumno);
+  const seleccionarProducto=(producto, caso)=>{
+    setproductoSeleccionado(producto);
 
     (caso==="Editar")?
     abrirCerrarModalEditar():
@@ -118,21 +114,19 @@ function App() {
         <tr>
           <th>ID</th>
           <th>Nombre</th>
-          <th>apellido</th>
-          <th>edad</th>
+          <th>Existencia</th>
           <th>Acciones</th>
         </tr>
       </thead>
       <tbody>
-        {data.map(alumno=>(
-          <tr key={alumno.id}>
-            <td>{alumno.id}</td>
-            <td>{alumno.nombre}</td>
-            <td>{alumno.apellido}</td>
-            <td>{alumno.edad}</td>
+        {data.map(producto=>(
+          <tr key={producto.id}>
+            <td>{producto.id}</td>
+            <td>{producto.nombre}</td>
+            <td>{producto.existencia}</td>
           <td>
-          <button className="btn btn-primary" onClick={()=>seleccionarAlumno(alumno, "Editar")}>Editar</button> {"  "}
-          <button className="btn btn-danger" onClick={()=>seleccionarAlumno(alumno, "Eliminar")}>Eliminar</button>
+          <button className="btn btn-primary" onClick={()=>seleccionarProducto(producto, "Editar")}>Editar</button> {"  "}
+          <button className="btn btn-danger" onClick={()=>seleccionarProducto(producto, "Eliminar")}>Eliminar</button>
           </td>
           </tr>
         ))}
@@ -144,21 +138,18 @@ function App() {
 
 
     <Modal isOpen={modalInsertar}>
-      <ModalHeader>Insertar alumno</ModalHeader>
+      <ModalHeader>Insertar producto</ModalHeader>
       <ModalBody>
         <div className="form-group">
           <label>Nombre: </label>
           <br />
           <input type="text" className="form-control" name="nombre" onChange={handleChange}/>
           <br />
-          <label>apellido: </label>
+          <label>Existencia: </label>
           <br />
-          <input type="text" className="form-control" name="apellido" onChange={handleChange}/>
+          <input type="text" className="form-control" name="existencia" onChange={handleChange}/>
           <br />
-          <label>edad: </label>
-          <br />
-          <input type="text" className="form-control" name="edad" onChange={handleChange}/>
-          <br />
+
         </div>
       </ModalBody>
       <ModalFooter>
@@ -170,20 +161,16 @@ function App() {
 
     
     <Modal isOpen={modalEditar}>
-      <ModalHeader>Editar alumno</ModalHeader>
+      <ModalHeader>Editar producto</ModalHeader>
       <ModalBody>
         <div className="form-group">
           <label>Nombre: </label>
           <br />
-          <input type="text" className="form-control" name="nombre" onChange={handleChange} value={alumnoSeleccionado && alumnoSeleccionado.nombre}/>
+          <input type="text" className="form-control" name="nombre" onChange={handleChange} value={productoSeleccionado && productoSeleccionado.nombre}/>
           <br />
-          <label>apellido: </label>
+          <label>Existencia: </label>
           <br />
-          <input type="text" className="form-control" name="apellido" onChange={handleChange} value={alumnoSeleccionado && alumnoSeleccionado.apellido}/>
-          <br />
-          <label>edad: </label>
-          <br />
-          <input type="text" className="form-control" name="edad" onChange={handleChange} value={alumnoSeleccionado && alumnoSeleccionado.edad}/>
+          <input type="text" className="form-control" name="existencia" onChange={handleChange} value={productoSeleccionado && productoSeleccionado.existencia}/>
           <br />
         </div>
       </ModalBody>
@@ -195,7 +182,7 @@ function App() {
 
     <Modal isOpen={modalEliminar}>
         <ModalBody>
-        ¿Estás seguro que deseas eliminar el alumno {alumnoSeleccionado && alumnoSeleccionado.nombre}?
+        ¿Estás seguro que deseas eliminar el producto {productoSeleccionado && productoSeleccionado.nombre}?
         </ModalBody>
         <ModalFooter>
           <button className="btn btn-danger" onClick={()=>peticionDelete()}>
